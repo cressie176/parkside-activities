@@ -15,7 +15,10 @@ npm run dev
 ```
 
 `npm run seed` creates `parkside.db` and fills it with data. `npm run dev` starts the API
-on port 3001 and the dashboard on http://localhost:5173.
+on port 3001 and the dashboard on http://localhost:5173. Override with the `API_PORT`,
+`WEB_PORT` and `DB_PATH` env vars (see `.env.example`), e.g. to run several worktrees at once.
+
+Working on this repo (especially as an agent)? Read [CLAUDE.md](CLAUDE.md).
 
 ## Layout
 

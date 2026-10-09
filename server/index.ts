@@ -2,7 +2,7 @@ import express from 'express'
 import { db } from './db.js'
 import { activityTotals, bookingsForDay, headlineStats, scheduleForDay } from './reporting.js'
 
-const PORT = 3001
+const PORT = Number(process.env.API_PORT) || 3001
 
 // Today in local time as 'YYYY-MM-DD'. Not toISOString(), which is UTC and
 // rolls over to tomorrow while the team are still on shift.

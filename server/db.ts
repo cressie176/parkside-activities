@@ -1,10 +1,5 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-
-// Resolve the db file relative to the repo root, not the process cwd.
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbPath = path.join(__dirname, '..', 'parkside.db')
+import { dbPath } from './dbPath.js'
 
 export const db = new Database(dbPath)
 

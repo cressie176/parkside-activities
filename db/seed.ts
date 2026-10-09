@@ -1,9 +1,5 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const dbPath = path.join(__dirname, '..', 'parkside.db')
+import { dbPath } from '../server/dbPath.js'
 
 // Fixed seed so the sample data is the same every time it's rebuilt.
 function mulberry32(seed: number): () => number {
