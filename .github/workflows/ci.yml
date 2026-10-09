@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Node 24 bundles npm 11, which ignores the `allowScripts` allowlist in
+      # package.json and runs every install script. Use npm 12 so CI installs
+      # the same way as local development (only allowlisted scripts run).
+      - name: Install npm 12
+        run: npm install -g npm@12
+
+      - run: npm --version
+
+      - run: npm ci
+
+      - run: npm run seed
+
+      - run: npm run check

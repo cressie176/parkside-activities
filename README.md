@@ -1,5 +1,7 @@
 # Parkside Activities
 
+[![CI](https://github.com/cressie176/parkside-activities/actions/workflows/ci.yml/badge.svg)](https://github.com/cressie176/parkside-activities/actions/workflows/ci.yml)
+
 Internal dashboard for the activities team at Parkside. Guests book onto sessions —
 archery, aqua fit, kids' club, evening shows and the rest — and this shows the team how
 those sessions are filling up and where the pressure is.
