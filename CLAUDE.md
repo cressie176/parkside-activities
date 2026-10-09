@@ -8,13 +8,17 @@ React + Vite front end, TypeScript throughout. Node is pinned via `.nvmrc` (24).
 - `server/reporting.ts`: all aggregation logic (unit tested in `server/reporting.test.ts`, `:memory:` DB).
 - `server/index.ts`: thin Express routes that call into `reporting.ts`. `server/db.ts` opens the DB.
 - `src/App.tsx`, `src/components/*`: React dashboard. `db/seed.ts`: schema and seed data.
+- Component tests: `src/components/<Name>.test.tsx`, jsdom + Testing Library (arriving with #24).
+- End-to-end tests: `e2e/*.e2e.ts`, Playwright against a seeded DB (arriving with #25).
 
 ## Commands
 - `npm ci`: install. `npm run seed`: (re)create and fill the SQLite DB.
 - `npm run dev`: API (default 3001) and dashboard (default 5173, proxies `/api`).
-- `npm run check`: typecheck, tests, build. Must pass before every commit.
-- `npm run lint:fix`: Biome lint and format (arriving with #14).
-- Git hooks via Lefthook (arriving with #15); CI runs the checks on every PR (#16).
+- `npm run check`: typecheck, lint, tests, build. Must pass before every commit.
+- `npm run lint:fix`: Biome lint and format.
+- `npm run test:e2e`: Playwright end-to-end tests, not part of `check` (arriving with #25).
+- Lefthook git hooks install on `npm ci`. pre-commit: Biome (auto-fixes staged files), typecheck,
+  tests. pre-push: `npm run check`. CI runs the checks on every PR.
 
 Env vars (all optional, see `.env.example`): `API_PORT`, `WEB_PORT`, `DB_PATH` (relative to repo root).
 
@@ -34,6 +38,9 @@ Each worktree gets its own `parkside.db`, so seeds don't collide.
 
 ## Workflow rules
 - Discuss the issue with the user before starting. One branch per issue.
-- TDD for changes to `reporting.ts`: write the failing test first.
+- TDD: write the failing test first, at the lowest level that covers the change:
+  - aggregation logic in `reporting.ts`: unit test in `server/reporting.test.ts`.
+  - anything the dashboard renders: component test (once #24 lands).
+  - user-visible flows across the running app (navigation, `?date=`): Playwright test (once #25 lands).
 - Run `npm run check` before every commit. Never use `--no-verify`.
 - Push and open a PR whose body contains `Closes #N`, and summarise any deviations from the issue.
