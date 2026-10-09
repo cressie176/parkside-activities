@@ -1,0 +1,17 @@
+# Git hooks (https://lefthook.dev). Installed by `npm ci` / `npm install` via the
+# `prepare` script; hooks live in the shared .git/hooks, so they apply to every worktree.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      run: npx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: typecheck
+      run: npm run typecheck
+    - name: test
+      run: npm test
+
+pre-push:
+  jobs:
+    - name: check
+      run: npm run check
