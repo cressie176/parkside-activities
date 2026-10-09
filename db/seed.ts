@@ -37,27 +37,75 @@ interface ActivityDefinition {
 }
 
 const ACTIVITIES: readonly ActivityDefinition[] = [
-  { name: 'Archery', capacity: 12, duration: 60, times: ['09:00', '11:00', '15:00'], fill: [0.2, 1] },
+  {
+    name: 'Archery',
+    capacity: 12,
+    duration: 60,
+    times: ['09:00', '11:00', '15:00'],
+    fill: [0.2, 1],
+  },
   { name: 'Aqua Fit', capacity: 20, duration: 45, times: ['09:30', '17:30'], fill: [0.2, 0.95] },
   { name: "Kids' Club", capacity: 25, duration: 120, times: ['09:00', '10:30'], fill: [0.3, 1] },
   { name: 'Evening Show', capacity: 120, duration: 90, times: ['20:00'], fill: [0.15, 0.5] },
   { name: 'Pottery', capacity: 10, duration: 90, times: ['14:00'], fill: [0.15, 0.9] },
-  { name: 'Tennis Coaching', capacity: 8, duration: 60, times: ['08:30', '16:00'], fill: [0.15, 1] },
-  { name: 'Bike Hire Tour', capacity: 15, duration: 120, times: ['10:00', '14:30'], fill: [0.2, 0.9] },
+  {
+    name: 'Tennis Coaching',
+    capacity: 8,
+    duration: 60,
+    times: ['08:30', '16:00'],
+    fill: [0.15, 1],
+  },
+  {
+    name: 'Bike Hire Tour',
+    capacity: 15,
+    duration: 120,
+    times: ['10:00', '14:30'],
+    fill: [0.2, 0.9],
+  },
   { name: 'Crazy Golf', capacity: 30, duration: 60, times: ['11:30', '16:30'], fill: [0.15, 0.7] },
 ]
 
 const GUEST_NAMES = [
-  'Lauren Whitfield', 'Michael Osei', 'Rhiannon Davies', 'Sanjay Ahmed',
-  'Fiona Balfour', 'Callum Reid', 'Nadia Hussain', 'Gareth Pritchard',
-  'Imogen Clarke', 'Dermot Kelly', 'Priya Nair', 'Stuart Menzies',
-  'Bethan Lloyd', 'Owen Trethewey', 'Amara Okonkwo', 'Hamish Sinclair',
-  'Josie Bramwell', 'Tomasz Nowak', 'Ellie Fairbairn', 'Raj Chandra',
-  'Morag Buchanan', 'Dylan Hargreaves', 'Sofia Marchetti', 'Neil Cathcart',
-  'Kirsty Dunlop', 'Abdul Rahman', 'Verity Ashcombe', 'Liam Doherty',
-  'Chloe Nesbitt', 'Peter Grantham', 'Yasmin Farouk', 'Duncan Erskine',
-  'Harriet Vaughan', 'Joseph Adeyemi', 'Megan Tudor', 'Ciaran Boyle',
-  'Alice Pemberton', 'Ravi Deshpande', 'Sian Morgan', 'Alan Widdowson',
+  'Lauren Whitfield',
+  'Michael Osei',
+  'Rhiannon Davies',
+  'Sanjay Ahmed',
+  'Fiona Balfour',
+  'Callum Reid',
+  'Nadia Hussain',
+  'Gareth Pritchard',
+  'Imogen Clarke',
+  'Dermot Kelly',
+  'Priya Nair',
+  'Stuart Menzies',
+  'Bethan Lloyd',
+  'Owen Trethewey',
+  'Amara Okonkwo',
+  'Hamish Sinclair',
+  'Josie Bramwell',
+  'Tomasz Nowak',
+  'Ellie Fairbairn',
+  'Raj Chandra',
+  'Morag Buchanan',
+  'Dylan Hargreaves',
+  'Sofia Marchetti',
+  'Neil Cathcart',
+  'Kirsty Dunlop',
+  'Abdul Rahman',
+  'Verity Ashcombe',
+  'Liam Doherty',
+  'Chloe Nesbitt',
+  'Peter Grantham',
+  'Yasmin Farouk',
+  'Duncan Erskine',
+  'Harriet Vaughan',
+  'Joseph Adeyemi',
+  'Megan Tudor',
+  'Ciaran Boyle',
+  'Alice Pemberton',
+  'Ravi Deshpande',
+  'Sian Morgan',
+  'Alan Widdowson',
 ]
 
 // Party sizes skew small, with enough larger groups that counting bookings and
@@ -236,11 +284,11 @@ db.exec(`
 
 const insertSession = db.prepare(
   `INSERT INTO sessions (activity, date, start_time, duration_minutes, capacity)
-   VALUES (?, ?, ?, ?, ?)`
+   VALUES (?, ?, ?, ?, ?)`,
 )
 const insertBooking = db.prepare(
   `INSERT INTO bookings (session_id, guest_name, party_size, status, created_at)
-   VALUES (?, ?, ?, ?, ?)`
+   VALUES (?, ?, ?, ?, ?)`,
 )
 
 const planned = planSessions()
@@ -253,12 +301,18 @@ const seed = db.transaction(() => {
       session.date,
       session.startTime,
       session.duration,
-      session.capacity
+      session.capacity,
     )
     const sessionId = Number(result.lastInsertRowid)
 
     for (const size of partySizesFor(session.confirmedPlaces)) {
-      insertBooking.run(sessionId, pick(GUEST_NAMES), size, 'confirmed', createdAtBefore(session.date))
+      insertBooking.run(
+        sessionId,
+        pick(GUEST_NAMES),
+        size,
+        'confirmed',
+        createdAtBefore(session.date),
+      )
       bookingTotal += 1
     }
 
@@ -268,7 +322,7 @@ const seed = db.transaction(() => {
         pick(GUEST_NAMES),
         pick(PARTY_SIZES),
         'cancelled',
-        createdAtBefore(session.date)
+        createdAtBefore(session.date),
       )
       bookingTotal += 1
     }
@@ -280,7 +334,7 @@ seed()
 const dates = planned.map((s) => s.date).sort()
 console.log(
   `Seeded ${planned.length} sessions and ${bookingTotal} bookings ` +
-    `covering ${dates[0]} to ${dates[dates.length - 1]}.`
+    `covering ${dates[0]} to ${dates[dates.length - 1]}.`,
 )
 
 db.close()

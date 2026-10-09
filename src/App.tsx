@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import StatCards, { type Stats } from './components/StatCards'
-import ScheduleTable, { type ScheduleSession } from './components/ScheduleTable'
 import ActivityTotals, { type ActivityTotal } from './components/ActivityTotals'
 import BookingsList, { type Booking } from './components/BookingsList'
+import ScheduleTable, { type ScheduleSession } from './components/ScheduleTable'
+import StatCards, { type Stats } from './components/StatCards'
 
 function todayLocal(): string {
   const now = new Date()
