@@ -17,6 +17,8 @@ export interface SessionWithBookings {
 
 // Sessions for a single day, with booking totals attached via a single
 // grouped query rather than N+1 lookups.
+// Only confirmed bookings count. The status filter sits in the join, not the
+// WHERE clause, so sessions with no confirmed bookings still appear.
 function sessionsWithBookings(db: Database.Database, date: string): SessionWithBookings[] {
   return db
     .prepare(
@@ -30,7 +32,7 @@ function sessionsWithBookings(db: Database.Database, date: string): SessionWithB
          COUNT(b.id) AS bookingCount,
          COALESCE(SUM(b.party_size), 0) AS bookedPlaces
        FROM sessions s
-       LEFT JOIN bookings b ON b.session_id = s.id
+       LEFT JOIN bookings b ON b.session_id = s.id AND b.status = 'confirmed'
        WHERE s.date = ?
        GROUP BY s.id
        ORDER BY s.start_time, s.activity`,
@@ -80,7 +82,7 @@ export function headlineStats(db: Database.Database, date: string): HeadlineStat
       `SELECT AVG(b.party_size) AS avgPartySize
        FROM bookings b
        JOIN sessions s ON s.id = b.session_id
-       WHERE s.date = ?`,
+       WHERE s.date = ? AND b.status = 'confirmed'`,
     )
     .get(date) as { avgPartySize: number | null }
 
@@ -128,6 +130,7 @@ export interface ActivityTotal {
 }
 
 // Per-activity totals for the day, busiest activity (by places booked) first.
+// Confirmed bookings only, filtered in the join as in sessionsWithBookings.
 export function activityTotals(db: Database.Database, date: string): ActivityTotal[] {
   return db
     .prepare(
@@ -137,7 +140,7 @@ export function activityTotals(db: Database.Database, date: string): ActivityTot
          COUNT(b.id) AS bookingCount,
          COALESCE(SUM(b.party_size), 0) AS bookedPlaces
        FROM sessions s
-       LEFT JOIN bookings b ON b.session_id = s.id
+       LEFT JOIN bookings b ON b.session_id = s.id AND b.status = 'confirmed'
        WHERE s.date = ?
        GROUP BY s.activity
        ORDER BY bookedPlaces DESC`,
