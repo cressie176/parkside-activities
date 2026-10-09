@@ -33,7 +33,7 @@ function sessionsWithBookings(db: Database.Database, date: string): SessionWithB
        LEFT JOIN bookings b ON b.session_id = s.id
        WHERE s.date = ?
        GROUP BY s.id
-       ORDER BY s.start_time, s.activity`
+       ORDER BY s.start_time, s.activity`,
     )
     .all(date) as SessionWithBookings[]
 }
@@ -70,7 +70,7 @@ export function headlineStats(db: Database.Database, date: string): HeadlineStat
         `SELECT COUNT(*) AS count
          FROM bookings b
          JOIN sessions s ON s.id = b.session_id
-         WHERE s.date = ? AND b.status = 'cancelled'`
+         WHERE s.date = ? AND b.status = 'cancelled'`,
       )
       .get(date) as { count: number }
   ).count
@@ -80,7 +80,7 @@ export function headlineStats(db: Database.Database, date: string): HeadlineStat
       `SELECT AVG(b.party_size) AS avgPartySize
        FROM bookings b
        JOIN sessions s ON s.id = b.session_id
-       WHERE s.date = ?`
+       WHERE s.date = ?`,
     )
     .get(date) as { avgPartySize: number | null }
 
@@ -140,7 +140,7 @@ export function activityTotals(db: Database.Database, date: string): ActivityTot
        LEFT JOIN bookings b ON b.session_id = s.id
        WHERE s.date = ?
        GROUP BY s.activity
-       ORDER BY bookedPlaces DESC`
+       ORDER BY bookedPlaces DESC`,
     )
     .all(date) as ActivityTotal[]
 }
@@ -170,7 +170,7 @@ export function bookingsForDay(db: Database.Database, date: string): BookingList
        FROM bookings b
        JOIN sessions s ON s.id = b.session_id
        WHERE s.date = ?
-       ORDER BY s.start_time, b.guest_name`
+       ORDER BY s.start_time, b.guest_name`,
     )
     .all(date) as BookingListEntry[]
 }

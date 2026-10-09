@@ -21,7 +21,7 @@ beforeAll(() => {
 
   const insertSession = db.prepare(
     `INSERT INTO sessions (id, activity, date, start_time, duration_minutes, capacity)
-     VALUES (?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?)`,
   )
   insertSession.run(1, 'Archery', '2026-03-14', '09:00', 60, 12)
   insertSession.run(2, 'Aqua Fit', '2026-03-14', '09:30', 45, 20)
@@ -30,7 +30,7 @@ beforeAll(() => {
 
   const insertBooking = db.prepare(
     `INSERT INTO bookings (session_id, guest_name, party_size, status, created_at)
-     VALUES (?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?)`,
   )
   insertBooking.run(1, 'Alice Brennan', 4, 'confirmed', '2026-03-01T10:00:00Z')
   insertBooking.run(1, 'Ben Carlisle', 3, 'confirmed', '2026-03-02T11:00:00Z')
@@ -81,18 +81,38 @@ describe('headlineStats', () => {
 })
 
 describe('scheduleForDay', () => {
-  it('lists the day\'s sessions in start-time order with their booking counts', () => {
+  it("lists the day's sessions in start-time order with their booking counts", () => {
     const schedule = scheduleForDay(db, '2026-03-14')
     expect(schedule).toEqual([
-      expect.objectContaining({ activity: 'Archery', start_time: '09:00', capacity: 12, bookings: 4 }),
-      expect.objectContaining({ activity: 'Aqua Fit', start_time: '09:30', capacity: 20, bookings: 2 }),
-      expect.objectContaining({ activity: 'Pottery', start_time: '14:00', capacity: 10, bookings: 1 }),
+      expect.objectContaining({
+        activity: 'Archery',
+        start_time: '09:00',
+        capacity: 12,
+        bookings: 4,
+      }),
+      expect.objectContaining({
+        activity: 'Aqua Fit',
+        start_time: '09:30',
+        capacity: 20,
+        bookings: 2,
+      }),
+      expect.objectContaining({
+        activity: 'Pottery',
+        start_time: '14:00',
+        capacity: 10,
+        bookings: 1,
+      }),
     ])
   })
 
   it('does not include sessions from other days', () => {
     const schedule = scheduleForDay(db, '2026-03-14')
-    expect(schedule.find((entry) => entry.activity === 'Archery' && entry.start_time === '09:00' && entry.capacity === 12)).toBeTruthy()
+    expect(
+      schedule.find(
+        (entry) =>
+          entry.activity === 'Archery' && entry.start_time === '09:00' && entry.capacity === 12,
+      ),
+    ).toBeTruthy()
     expect(schedule).toHaveLength(3)
     expect(scheduleForDay(db, '2026-03-15')).not.toEqual(schedule)
   })
@@ -128,7 +148,7 @@ describe('bookingsForDay', () => {
     expect(bookings.find((b) => b.guest_name === 'Huw Idris')).toBeUndefined()
   })
 
-  it('carries the session\'s activity and start time through on each row', () => {
+  it("carries the session's activity and start time through on each row", () => {
     const bookings = bookingsForDay(db, '2026-03-14')
     const alice = bookings.find((b) => b.guest_name === 'Alice Brennan')
     expect(alice).toMatchObject({ activity: 'Archery', start_time: '09:00' })
